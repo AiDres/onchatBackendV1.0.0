@@ -1,0 +1,18 @@
+-- 配置解码方式
+SET NAMES UTF8;
+
+DROP DATABASE IF EXISTS store;
+
+CREATE DATABASE store CHARSET=UTF8;
+
+USE store;
+
+CREATE TABLE users(
+	uid INT PRIMARY KEY AUTO_INCREMENT,
+	uname VARCHAR(36),
+	uAvatar VARCHAR(255),
+	email VARCHAR(32),
+	phone VARCHAR(32),
+	upwd VARCHAR(32),
+	
+)
