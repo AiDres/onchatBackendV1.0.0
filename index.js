@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-
+const pool = require('./pool.js');
 
 var app = express();
 app.listen(3000);
@@ -35,7 +35,49 @@ app.use(cors({
   maxAge: 3600
 }))
 
-app.post('/onchat/index',(req,res)=>{
-	console.log(req.body.email,req.body.pwd);
-	res.send({msg:'success'})
+app.use(function (req, res, next) {
+	let resLogin = req.session.islogin;
+	if (!resLogin) {
+	  req.session.islogin = {}
+	}
+	next()
 })
+
+app.post('/onchat/login',(req,res)=>{
+	let email = req.body.email;
+	let upwd = req.body.pwd;
+	if(!email){res.send({code:-1,msg:'邮箱不能为空'});return;};
+	if(!upwd){res.send({code:-2,msg:'邮箱不能为空'});return;};
+	console.log(email,upwd)
+	let sql = 'SELECT userid,uname,uAvatar,email,sex,fllowers,friends,tips,news FROM users WHERE email=? AND upwd=md5(?)';
+	pool.query(sql,[email,upwd],(err,result)=>{	
+		if(err) throw err;
+		if(result.length){
+			req.session.islogin['state']="true";
+			req.session.islogin['uid']=result[0].uid;
+			res.send({code:200,data:result});
+		}else{
+			res.send({code:301,msg:"手机号或密码不匹配"});
+		}
+	});
+});
+
+// 判断是否是登录状态
+app.post('/onchat/hasLogin',(req,res)=>{
+	if(req.session.islogin && req.session.islogin.state){
+		let userInfo = {};
+		let sql = 'SELECT userid,uname,uAvatar,email,sex,fllowers,friends,tips,news FROM users WHERE userid=?';
+		pool.query(sql,[req.session.islogin.uid],(err,result)=>{
+			if(err) throw err;
+			if(result.length){
+				res.send({code:305,msg:'已登录',data:userInfo});
+			}else{
+				res.send({code:403,msg:'服务器异常',data:{}});
+			}
+			
+		})
+	}else{
+		res.send({code:404,msg:'未登录'});
+	}
+	
+});
