@@ -48,13 +48,12 @@ app.post('/onchat/login',(req,res)=>{
 	let upwd = req.body.pwd;
 	if(!email){res.send({code:-1,msg:'邮箱不能为空'});return;};
 	if(!upwd){res.send({code:-2,msg:'邮箱不能为空'});return;};
-	console.log(email,upwd)
 	let sql = 'SELECT userid,uname,uAvatar,email,sex,fllowers,friends,tips,news FROM users WHERE email=? AND upwd=md5(?)';
 	pool.query(sql,[email,upwd],(err,result)=>{	
 		if(err) throw err;
 		if(result.length){
 			req.session.islogin['state']="true";
-			req.session.islogin['uid']=result[0].uid;
+			req.session.islogin['uid']=result[0].userid;
 			res.send({code:200,data:result});
 		}else{
 			res.send({code:301,msg:"手机号或密码不匹配"});
@@ -70,7 +69,7 @@ app.post('/onchat/hasLogin',(req,res)=>{
 		pool.query(sql,[req.session.islogin.uid],(err,result)=>{
 			if(err) throw err;
 			if(result.length){
-				res.send({code:305,msg:'已登录',data:userInfo});
+				res.send({code:305,msg:'已登录',data:result});
 			}else{
 				res.send({code:403,msg:'服务器异常',data:{}});
 			}
@@ -81,3 +80,26 @@ app.post('/onchat/hasLogin',(req,res)=>{
 	}
 	
 });
+
+
+// 获取动态
+app.post('/onchat/article',(req,res)=>{
+	if(req.session.islogin && req.session.islogin.state){
+		let userInfo = {};
+		let sql = 'SELECT userid,newsid,title,newslike,themeimage,newstime,content,spectator FROM ownnews WHERE userid=?';
+		console.log(req.session.islogin.uid,'article')
+		pool.query(sql,[req.session.islogin.uid],(err,result)=>{
+			if(err) throw err;
+			
+			if(result.length){
+				console.log(result)
+				res.send({code:305,msg:'获取成功',data:result});
+			}else{
+				res.send({code:403,msg:'服务器异常',data:{}});
+			}
+			
+		})
+	}else{
+		res.send({code:404,msg:'未登录'});
+	}
+})

@@ -25,8 +25,8 @@ INSERT INTO users VALUES(1,'Dre','http://192.168.0.114:3000/images/users/dre_1.J
 
 
 CREATE TABLE ownnews(
-	userid INT PRIMARY KEY AUTO_INCREMENT,
-	newsid INT,
+	userid INT,
+	newsid INT PRIMARY KEY AUTO_INCREMENT,
 	title VARCHAR(32),
 	newslike INT,
 	themeimage VARCHAR(255),
@@ -34,4 +34,5 @@ CREATE TABLE ownnews(
 	content TEXT,
 	spectator INT
 );
-INSERT INTO ownNews VALUES(1,1,'商业的本质',90,'http://192.168.0.114:3000/images/news/dre_1_msg.jpg',now(),'[德] 沃尔夫冈·J·蒙森 著；阎克文 译',82);
+INSERT INTO ownNews VALUES(1,1,'商业的本质',90,'http://192.168.0.114:3000/images/news/dre_1_msg.jpg',now(),'[德] 沃尔夫冈·J·蒙森 著；阎克文 译',82),
+(1,2,'#新时代下的救赎者#',90,'http://192.168.0.114:3000/images/news/dre_2_msg.jpg',now(),'我只关心未来，因为我的余生都在那里度过',82);
