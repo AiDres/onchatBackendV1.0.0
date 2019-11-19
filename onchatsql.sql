@@ -10,6 +10,7 @@ USE store;
 CREATE TABLE users(
 	userid INT PRIMARY KEY AUTO_INCREMENT,
 	uname VARCHAR(36),
+	securitycode VARCHAR(255),
 	uAvatar VARCHAR(255),
 	email VARCHAR(32),
 	phone VARCHAR(32),
@@ -21,7 +22,7 @@ CREATE TABLE users(
 	news INT,
 	registerDate DATETIME
 );
-INSERT INTO users VALUES(1,'Dre','http://192.168.0.114:3000/images/users/dre_1.JPG','1418145349@qq.com','13916613305',md5('du42DU!'),1,90,2509,'新常态下的“十三五”弈局',29,now());
+INSERT INTO users VALUES(1,'Dre','','http://192.168.0.114:3000/images/users/dre_1.JPG','1418145349@qq.com','13916613305',md5('du42DU!'),1,90,2509,'新常态下的“十三五”弈局',29,now());
 
 
 CREATE TABLE ownnews(
