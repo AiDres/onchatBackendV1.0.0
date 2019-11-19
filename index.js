@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
 const pool = require('./pool.js');
-
+const md5 = require('md5');
 var app = express();
 app.listen(3000);
 app.use(express.static('public'));
