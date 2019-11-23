@@ -49,7 +49,7 @@ app.post('/onchat/login',(req,res)=>{
 	let email = req.body.email;
 	let upwd = req.body.pwd;
 	if(!email){res.send({code:-1,msg:'邮箱不能为空'});return;};
-	if(!upwd){res.send({code:-2,msg:'邮箱不能为空'});return;};
+	if(!upwd){res.send({code:-2,msg:'密码不能为空'});return;};
 
 	// 查询是否存在用户
 	let sql = 'SELECT userid,uname,uAvatar,email,sex,fllowers,friends,tips,news,registerDate FROM users WHERE email=? AND upwd=md5(?)';
