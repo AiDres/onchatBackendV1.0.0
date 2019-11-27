@@ -8,7 +8,7 @@ const fs = require('fs');
 var app = express();
 app.listen(3000);
 app.use(express.static('public'));
-
+var U = require('./util');
 // 处理post请求
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
