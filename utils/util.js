@@ -21,9 +21,10 @@ function getUserid(params,session,success){
 	}
 }
 
-function outputLog(data){
+function outputLog(data,dosuccess){
 	let logId = getLogId();
 	data['logId'] = logId;
+	dosuccess && dosuccess(logId);
 	fs.appendFile('./logs.log',`${JSON.stringify(data)}\n`,(err,result)=>{
 		if(err) throw err;
 	})

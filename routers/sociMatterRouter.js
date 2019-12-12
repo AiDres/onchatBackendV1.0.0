@@ -7,7 +7,8 @@ var U = require('../utils/util');
 // 获取动态
 router.post('/article',(req,res)=>{
 	let session = req.session.security;
-	U.outputLog({path:'/article',req:req.body});
+	let logId = null;
+	U.outputLog({path:'/article',req:req.body},res=>logId=res);
 	U.getUserid(req.body,session,(uid)=>{
 
 		if(uid!=-1){
@@ -19,7 +20,7 @@ router.post('/article',(req,res)=>{
 
 					res.send({code:305,msg:'获取成功',data:result});
 				}else{
-					res.send({code:403,msg:'服务器异常，请将logid提供给管理员',logid:logId});
+					res.send({code:403,msg:'success null',logid:logId});
 				}
 				
 			})
