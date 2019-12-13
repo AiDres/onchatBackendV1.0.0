@@ -33,10 +33,10 @@ INSERT INTO users VALUES
 CREATE TABLE frinds(
 	frindsId INT PRIMARY KEY AUTO_INCREMENT,  -- 主键id
 	relationId INT, -- 朋友id
-	userId INT PRIMARY KEY AUTO_INCREMENT,	-- 用户id
-	establishDate DATETIME,	-- 创建时间
+	userId INT,	-- 用户id
+	establishDate DATETIME	-- 创建时间
 );
-INSERT INTO frinds VALUES(0,2,1,now()),(0,3,1,now()),(0,4,1,now());
+INSERT INTO frinds VALUES(1,2,1,now()),(2,3,1,now()),(3,4,1,now());
 
 -- 动态消息表
 CREATE TABLE ownnews(
@@ -55,14 +55,20 @@ INSERT INTO ownNews VALUES(1,1,'商业的本质',90,'http://192.168.0.114:3000/i
 
 -- 通讯信息表
 CREATE TABLE messages(
-	orderId INT PRIMARY KEY AUTO_INCREMENT, -- 主键id
-	userId INT,	-- 用户id
-	frindId INT,	-- 朋友id
-	countId INT,	-- 数量id
-	createTime DATETIME,	--创建时间
-	msgInfo TEXT	-- 内容消息
+	orderId INT PRIMARY KEY AUTO_INCREMENT, --	主键id
+	userId INT,	--	用户id
+	frindId INT,	--	朋友id
+	countId INT,	--	数量id
+	createTime DATETIME,	--	创建时间
+	msgInfo TEXT	--	内容消息
 );
 INSERT INTO messages VALUES
-(0,1,2,1,now(),"今晚约吗？"),
-(1,1,2,2,now(),"老地方见"),
-(2,1,2,3,now(),"别走，可以吗？我好爱你");
+(1,1,2,1,now(),"今晚约吗？"),
+(2,1,2,2,now(),"老地方见"),
+(3,1,2,3,now(),"别走，可以吗？我好爱你"),
+(4,1,3,1,now(),"在这个moment我想对你说三个字"),
+(5,1,3,2,now(),"还有几天？"),
+(6,1,3,3,now(),"下班前给我"),
+(7,1,4,1,now(),"没有"),
+(8,1,4,2,now(),"多少"),
+(9,1,4,3,now(),"那家馆子在哪？");

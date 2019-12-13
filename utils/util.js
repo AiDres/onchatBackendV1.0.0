@@ -4,7 +4,7 @@ const fs = require('fs');
 
 function getUserid(params,session,success){
 	let uid = -1;
-	if(session && session.tokenCode && params.tokencode === session.tokenCode){
+	if(session && session.length && session.indexOf(params.tokencode)!=-1){
 		let sql = "SELECT userid FROM users WHERE securitycode=?";
 
 		pool.query(sql,[params.tokencode],(err,result)=>{
@@ -16,8 +16,8 @@ function getUserid(params,session,success){
 				success(uid);
 			}
 		})
-	
-	
+	}else{
+		success(uid);
 	}
 }
 

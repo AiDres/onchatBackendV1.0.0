@@ -19,8 +19,14 @@ router.post('/login',(req,res)=>{
 		if(result.length){
 			// 生成token
 			let tokencode = md5('md5-'+result[0].registerDate+Math.floor(Math.random() * Math.floor(new Date().getTime())));
+			if(JSON.stringify(req.session.security)!='{}'){
+				let count = req.session.security;
+				count.push(tokencode);
+				req.session.security = count;
+			}else{
+				req.session.security = [tokencode];
+			}
 			req.session.security['tokenCode']=tokencode;
-
 			// 更新保存token至数据库
 			let sql = 'UPDATE users SET securitycode=? WHERE userid=?';
 			pool.query(sql,[tokencode,result[0].userid],(err,setResult)=>{
@@ -42,11 +48,13 @@ router.post('/login',(req,res)=>{
 
 // 判断是否是登录状态
 router.post('/hasLogin',(req,res)=>{
-    let session = req.session.security;
+    let session = JSON.stringify(req.session.security)!="{}"?req.session.security:false;
     U.outputLog({path:'/hasLogin',req:req.body});
-	if(session && session.tokenCode && req.body.tokencode === session.tokenCode){
+    let logId = null;
+	U.outputLog({path:'/getMsgList',req:req.body},res=>logId=res);
+	if(session && session.length && session.indexOf(req.body.tokencode)!=-1){
         let sql = 'SELECT userid,uname,uAvatar,email,sex,fllowers,friends,tips,news FROM users WHERE securitycode=?';
-		pool.query(sql,[session.tokenCode],(err,result)=>{
+		pool.query(sql,[req.body.tokencode],(err,result)=>{
 			if(err) throw err;
 			if(result.length){
 				res.send({code:305,msg:'已登录',data:result});
@@ -59,5 +67,52 @@ router.post('/hasLogin',(req,res)=>{
 		res.send({code:404,msg:'未登录'});
 	}
 });
+
+router.post('/getMsgList',(req,res)=>{
+	let session = JSON.stringify(req.session.security)!="{}"?req.session.security:[];
+	U.outputLog({path:'/getMsgList',req:req.body});
+	let logId = null;
+	U.outputLog({path:'/getMsgList',req:req.body},res=>logId=res);
+	console.log(req.body,session)
+	U.getUserid(req.body,session,(uid)=>{
+		if(uid!=-1){
+			// 1.根据用户id查找与id匹配的数据->2.取数据的好友id查用户表->3.获取关键信息->步骤1和3根据用户id进行合并->返回给前端
+			let sql = "SELECT * FROM messages WHERE userId=?;";
+			pool.query(sql,[uid],(err,result1)=>{
+				if(err) throw err;
+				if(result1.length){
+					let msglistData = result1;
+					let userIds = result1.map(p=>(p.frindId).toString());
+					let userSql = `SELECT userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
+					let resultList = [];
+					pool.query(userSql,userIds,(err,result2)=>{
+						if(err) throw err;
+						result2.forEach(item1=>{
+							let item = result1.filter(item2=>item2.frindId==item1.userid);
+							delete item1.userid;
+							item1['msgList'] = item;
+
+						})
+						res.send({code:200,msg:'获取成功',data:result2,logid:logId});
+					})
+				}else{
+					res.send({code:302,msg:'暂无数据',logid:logId});
+				}
+			})
+			// pool.query(sql,[uid],(err,result)=>{
+			// 	if(err)throw err;
+			// 	if(result.length){
+
+			// 		res.send({code:305,msg:'获取成功',data:result});
+			// 	}else{
+			// 		res.send({code:403,msg:'success null',logid:logId});
+			// 	}
+				
+			// });
+		}else{
+			res.send({code:301,msg:'用户不存在',logid:logId});
+		}
+	});
+})
 
 module.exports = router;
