@@ -77,19 +77,21 @@ router.post('/getMsgList',(req,res)=>{
 	U.getUserid(req.body,session,(uid)=>{
 		if(uid!=-1){
 			// 1.根据用户id查找与id匹配的数据->2.取数据的好友id查用户表->3.获取关键信息->步骤1和3根据用户id进行合并->返回给前端
-			let sql = "SELECT * FROM messages WHERE userId=?;";
-			pool.query(sql,[uid],(err,result1)=>{
+			let sql = "SELECT * FROM messages WHERE userId=? OR frindId=?;";
+			pool.query(sql,[uid,uid],(err,result1)=>{
 				if(err) throw err;
 				if(result1.length){
 					let msglistData = result1;
 					let userIds = result1.map(p=>(p.frindId).toString());
 					let userSql = `SELECT userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
 					let resultList = [];
+					console.log(result1);
 					pool.query(userSql,userIds,(err,result2)=>{
 						if(err) throw err;
 						result2.forEach(item1=>{
 							let item = result1.filter(item2=>item2.frindId==item1.userid);
 							delete item1.userid;
+							item.filter(p=>p.userId==uid?p.rightActive=true:'');
 							item1['msgList'] = item;
 
 						})
