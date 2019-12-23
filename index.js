@@ -4,19 +4,23 @@ const cors = require('cors');
 const session = require('express-session');
 const userRouter = require('./routers/userRouter');
 const socialMatteRouter = require('./routers/sociMatterRouter');
-
-
 var app = express();
-app.listen(3000,()=>{
-	console.log('listen a port 3000')
-});
+const server = require("http").createServer(app);
+const io = require("socket.io").listen(server);
+server.listen(3000, () => console.log("server running on port:3000"));
 app.use(express.static('public'));
 // 处理post请求
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended:false
 }));
-
+io.on("connection", socket => {
+  console.log("a user connected :D");
+  socket.on("chat message", msg => {
+    console.log(msg);
+    io.emit("chat message", msg);
+  });
+});
 // 配置session
 app.use(session({
 	path: '/', 

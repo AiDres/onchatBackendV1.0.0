@@ -68,6 +68,30 @@ router.post('/hasLogin',(req,res)=>{
 	}
 });
 
+/*
+	data = Array;
+		data[0]={
+			uname:string,
+			uAvatar:string,
+			email:string,
+			sex:number,
+			fllowers:number,
+			tips:string,
+			news:number,
+			msg:string,
+			msgTime:string,
+			msgList:Array,
+				msgList[0]={
+					orderId:number,
+					userId:number,
+					friend:number,
+					countId:number,
+					createTime:string,
+					msgInfo:string,
+					rightActive:boolan
+				}
+		}
+*/
 router.post('/getMsgList',(req,res)=>{
 	let session = JSON.stringify(req.session.security)!="{}"?req.session.security:[];
 	U.outputLog({path:'/getMsgList',req:req.body});
@@ -80,41 +104,28 @@ router.post('/getMsgList',(req,res)=>{
 			let sql = "SELECT * FROM messages WHERE userId=? OR frindId=?;";
 			pool.query(sql,[uid,uid],(err,result1)=>{
 				if(err) throw err;
-				if(result1.length){
-					let msglistData = result1;
-					let userIds = result1.map(p=>(p.frindId).toString());
-					let userSql = `SELECT userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
-					let resultList = [];
-					console.log(result1);
-					pool.query(userSql,userIds,(err,result2)=>{
-						if(err) throw err;
-						result2.forEach(item1=>{
-							let item = result1.filter(item2=>item2.frindId==item1.userid);
-							delete item1.userid;
-							item.filter(p=>p.userId==uid?p.rightActive=true:'');
-							item1['msgList'] = item;
+				let userIds = result1.map(p=>p.frindId==uid?(p.userId).toString():(p.frindId).toString());
+				let userSql = `SELECT userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
+				pool.query(userSql,userIds,(err,result2)=>{
+					result2.forEach(item1=>{
+						let item = [];
+						result1.forEach(item2=>{
+							if(item2.frindId==item1.userid || item2.userId==item1.userid){
+								item.push(item2);	
+							}
+						});
+						delete item1.userid;
+						item.filter(p=>p.userId==uid?p.rightActive=true:'');
+						item1['msgList'] = item;
 
-						})
-						res.send({code:200,msg:'获取成功',data:result2,logid:logId});
 					})
-				}else{
-					res.send({code:302,msg:'暂无数据',logid:logId});
-				}
-			})
-			// pool.query(sql,[uid],(err,result)=>{
-			// 	if(err)throw err;
-			// 	if(result.length){
-
-			// 		res.send({code:305,msg:'获取成功',data:result});
-			// 	}else{
-			// 		res.send({code:403,msg:'success null',logid:logId});
-			// 	}
+					res.send({code:200,msg:'获取成功',data:result2,logid:logId});
+				})
 				
-			// });
+			})
 		}else{
 			res.send({code:301,msg:'用户不存在',logid:logId});
 		}
 	});
-})
-
+});
 module.exports = router;
