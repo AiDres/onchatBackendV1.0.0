@@ -94,10 +94,11 @@ router.post('/hasLogin',(req,res)=>{
 */
 router.post('/getMsgList',(req,res)=>{
 	let session = JSON.stringify(req.session.security)!="{}"?req.session.security:[];
+	console.log("安全码：",req.session.security,req.body)
 	U.outputLog({path:'/getMsgList',req:req.body});
 	let logId = null;
 	U.outputLog({path:'/getMsgList',req:req.body},res=>logId=res);
-	console.log(req.body,session)
+	
 	U.getUserid(req.body,session,(uid)=>{
 		if(uid!=-1){
 			// 1.根据用户id查找与id匹配的数据->2.取数据的好友id查用户表->3.获取关键信息->步骤1和3根据用户id进行合并->返回给前端
@@ -105,7 +106,7 @@ router.post('/getMsgList',(req,res)=>{
 			pool.query(sql,[uid,uid],(err,result1)=>{
 				if(err) throw err;
 				let userIds = result1.map(p=>p.frindId==uid?(p.userId).toString():(p.frindId).toString());
-				let userSql = `SELECT userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
+				let userSql = `SELECT securitycode,userid,uname,uAvatar,email,sex,fllowers,tips,news FROM users WHERE userid IN (${(userIds.map(p=>p.replace(p,'?'))).toString()})`;
 				pool.query(userSql,userIds,(err,result2)=>{
 					result2.forEach(item1=>{
 						let item = [];
@@ -114,7 +115,9 @@ router.post('/getMsgList',(req,res)=>{
 								item.push(item2);	
 							}
 						});
+						item1['isOnline']=req.session.security.indexOf(item1.securitycode)!=-1?true:false;
 						delete item1.userid;
+						delete item1.securitycode;
 						item.filter(p=>p.userId==uid?p.rightActive=true:'');
 						item1['msgList'] = item;
 
