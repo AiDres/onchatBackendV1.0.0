@@ -9,16 +9,25 @@ const server = require("http").createServer(app);
 const io = require("socket.io").listen(server);
 server.listen(1081, () => console.log("server running on port:3000"));
 app.use(express.static('public'));
+const U = require('./utils/util.js');
 // 处理post请求
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended:false
 }));
 io.on("connection", socket => {
-  console.log("a user connected :D");
-  socket.on("chat message", msg => {
-    console.log(msg);
-    io.emit("chat message", msg);
+  console.log('连接成功')
+  socket.on("add", msg => {
+    U.addmessages(msg).then((data)=>{
+    	console.log(U.friendToken(msg.friendId),msg.tokencode);
+    	if(U.friendToken(msg.friendId)){
+    		io.emit(U.friendToken(msg.friendId), data);
+    	}
+
+    	data['rightActive'] = true;
+    	io.emit(msg.tokencode, data);
+    })
+    
   });
 });
 // 配置session

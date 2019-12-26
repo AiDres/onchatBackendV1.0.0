@@ -94,8 +94,6 @@ router.post('/hasLogin',(req,res)=>{
 */
 router.post('/getMsgList',(req,res)=>{
 	let session = JSON.stringify(req.session.security)!="{}"?req.session.security:[];
-	console.log("安全码：",req.session.security,req.body)
-	U.outputLog({path:'/getMsgList',req:req.body});
 	let logId = null;
 	U.outputLog({path:'/getMsgList',req:req.body},res=>logId=res);
 	
@@ -116,7 +114,6 @@ router.post('/getMsgList',(req,res)=>{
 							}
 						});
 						item1['isOnline']=req.session.security.indexOf(item1.securitycode)!=-1?true:false;
-						delete item1.userid;
 						delete item1.securitycode;
 						item.filter(p=>p.userId==uid?p.rightActive=true:'');
 						item1['msgList'] = item;
