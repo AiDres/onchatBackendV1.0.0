@@ -7,7 +7,7 @@ const socialMatteRouter = require('./routers/sociMatterRouter');
 var app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io").listen(server);
-server.listen(1080, () => console.log("server running on port:3000"));
+server.listen(1081, () => console.log("server running on port:3000"));
 app.use(express.static('public'));
 // 处理post请求
 app.use(bodyParser.json());

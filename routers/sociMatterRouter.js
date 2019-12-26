@@ -12,7 +12,7 @@ router.post('/article',(req,res)=>{
 	U.getUserid(req.body,session,(uid)=>{
 
 		if(uid!=-1){
-			let sql = 'SELECT userid,newsid,title,newslike,themeimage,newstime,content,spectator FROM ownnews WHERE userid=?';
+			let sql = 'SELECT userid,newsid,title,newslike,themeimage,newstime,content,spectator FROM ownNews WHERE userid=?';
 			
 			pool.query(sql,[uid],(err,result)=>{
 				if(err)throw err;

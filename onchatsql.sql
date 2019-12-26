@@ -39,7 +39,7 @@ CREATE TABLE frinds(
 INSERT INTO frinds VALUES(1,2,1,now()),(2,3,1,now()),(3,4,1,now());
 
 -- 动态消息表
-CREATE TABLE ownnews(
+CREATE TABLE ownNews(
 	userid INT,	-- 用户id
 	newsid INT PRIMARY KEY AUTO_INCREMENT,	-- 主键id
 	title VARCHAR(32),	-- 标题
