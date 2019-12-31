@@ -19,11 +19,9 @@ io.on("connection", socket => {
   console.log('连接成功')
   socket.on("add", msg => {
     U.addmessages(msg).then((data)=>{
-    	console.log(U.friendToken(msg.friendId),msg.tokencode);
     	if(U.friendToken(msg.friendId)){
     		io.emit(U.friendToken(msg.friendId), data);
     	}
-
     	data['rightActive'] = true;
     	io.emit(msg.tokencode, data);
     })
